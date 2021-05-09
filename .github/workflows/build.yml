@@ -1,9 +1,8 @@
-name: Build and Publish
+name: Build
 
 on:
   pull_request:
     branches: [ main ]
-  workflow_dispatch:
 
 env:
   WEBAPP_PACKAGE_PATH: 'app'
