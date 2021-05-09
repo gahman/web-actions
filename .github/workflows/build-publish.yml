@@ -1,0 +1,54 @@
+# Docs for the Azure Web Apps Deploy action: https://go.microsoft.com/fwlink/?linkid=2134798
+# More GitHub Actions for Azure: https://go.microsoft.com/fwlink/?linkid=2135048
+
+name: build publish multijob
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    # checkout the repo
+    - name: 'Checkout Github Action'
+      uses: actions/checkout@master
+
+    - name: Set up .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '5.0.x'
+
+    - name: Build with dotnet
+      run: dotnet build --configuration Release
+
+    - name: dotnet publish
+      run: dotnet publish --no-build -c Release -o ${{ github.workspace }}/app
+
+    - name: Upload Web Build Artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: Web
+        path: ${{ github.workspace }}/app
+
+  publish:
+    needs: build
+    runs-on: windows-latest
+
+    steps:
+    - name: Download Artifact
+      uses: actions/download-artifact@v1
+      with:
+        name: Web
+
+    - name: Get result
+      run: ls .
+
+    # - name: Run Azure webapp deploy action using publish profile credentials
+    #   uses: azure/webapps-deploy@v2
+    #   with:
+    #     app-name: gh-actions-web
+    #     slot-name: Production
+    #     publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_EAF73891196E48FD99A3E263631F75D6 }}
+    #     package: .
